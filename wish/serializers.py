@@ -6,6 +6,11 @@ from wish.models import Wish
 
 
 class WishSerializer(serializers.ModelSerializer):
+    is_myself = serializers.SerializerMethodField(read_only=True)
+
+    def get_is_myself(self, obj):
+        return True if obj.to_name else False
+
     def validate(self, data):
         if not data.get('is_open') and data.get('password'):
             raise serializers.ValidationError(
@@ -51,7 +56,8 @@ class WishSerializer(serializers.ModelSerializer):
             'password',
             'sp1',
             'sp2',
-            'sp3'
+            'sp3',
+            'is_myself'
         ]
 
         extra_kwargs = {
