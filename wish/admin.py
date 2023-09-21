@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from wish.models import Wish
+
+
+admin.site.register(Wish)
