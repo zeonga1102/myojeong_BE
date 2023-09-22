@@ -3,7 +3,7 @@ from random import randrange
 
 from rest_framework import serializers
 
-from myojeong_be.const import emoji_list
+from myojeong_be.const import EMOJI_LIST
 from wish.models import Wish
 
 
@@ -24,7 +24,7 @@ class WishSerializer(serializers.ModelSerializer):
 
             validated_data['password'] = hashing.hexdigest()
         
-        emoji = emoji_list[randrange(10)][0]
+        emoji = EMOJI_LIST[randrange(10)][0]
         validated_data['emoji'] = emoji
 
         wish = Wish(**validated_data)
