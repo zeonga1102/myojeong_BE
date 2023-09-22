@@ -1,12 +1,15 @@
 from uuid import uuid4
 from hashlib import sha256
 
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from wish.serializers import WishSerializer
+from myojeong_be.const import LIST_LMIT
+from wish.serializers import WishSerializer, WishListSerializer
 from wish.models import Wish
+from wish import SortedType
 
 
 class WishView(APIView):
@@ -63,7 +66,24 @@ class WishView(APIView):
 
 class WishListView(APIView):
     def get(self, request):
-        pass
+        sorted_type = SortedType.get_sorted_type(request.GET.get('sorted', 'recent'))
+        if not sorted_type:
+            return Response({'msg': '잘못된 정렬 기준입니다!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        page = int(request.GET.get('page', 1))
+        start = (page - 1) * LIST_LMIT
+        last = page * LIST_LMIT
+
+        keyword = request.GET.get('keyword')
+
+        query = Q(is_opne=True)
+        if keyword:
+            query = query & Q(from_name__istartswith=keyword)
+        wish_list = Wish.objects.filter(query).order_by(sorted_type.value)[start:last]
+        
+        serialized_wish_list_data = WishListSerializer(wish_list, many=True).data
+        
+        return Response({'wish_list': serialized_wish_list_data}, status=status.HTTP_200_OK)
 
 
 class WishLikeView(APIView):

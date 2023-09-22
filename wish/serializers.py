@@ -15,11 +15,6 @@ class WishSerializer(serializers.ModelSerializer):
     
 
     def create(self, validated_data):
-        validated_data['sp1'] = 0
-        validated_data['sp2'] = 0
-        validated_data['sp3'] = 0
-        validated_data['sp_sum'] = 0
-
         if not validated_data.get('to_name'):
             validated_data['to_name'] = None
 
@@ -47,9 +42,6 @@ class WishSerializer(serializers.ModelSerializer):
             'emoji',
             'is_open',
             'password',
-            'sp1',
-            'sp2',
-            'sp3',
             'is_myself'
         ]
 
@@ -57,4 +49,17 @@ class WishSerializer(serializers.ModelSerializer):
             'password': { 'write_only': True },
             'emoji': { 'required': False }
         }
+
+
+class WishListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wish
+        fields = [
+            "id",
+			"from_name",
+			"content",
+			"sp1",
+			"sp2",
+			"sp3"
+        ]
         
