@@ -9,7 +9,7 @@ class Wish(models.Model):
     content = models.CharField(max_length=150)
     emoji = models.CharField(max_length=2, choices=emoji_list)
     is_open = models.BooleanField(default=True)
-    password = models.CharField(max_length=256, default=None)
+    password = models.CharField(max_length=256, null=True, default=None)
     sp1 = models.IntegerField(default=0)
     sp2 = models.IntegerField(default=0)
     sp3 = models.IntegerField(default=0)
