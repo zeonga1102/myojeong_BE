@@ -1,7 +1,7 @@
 from uuid import uuid4
 from hashlib import sha256
 
-from django.db.models import Q
+from django.db.models import Q, F
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from myojeong_be.const import LIST_LMIT
 from wish.serializers import WishSerializer, WishListSerializer
 from wish.models import Wish
-from wish import SortedType
+from wish.enum import SortedType, SpType
 
 
 class WishView(APIView):
@@ -76,7 +76,7 @@ class WishListView(APIView):
 
         keyword = request.GET.get('keyword')
 
-        query = Q(is_opne=True)
+        query = Q(is_open=True)
         if keyword:
             query = query & Q(from_name__istartswith=keyword)
         wish_list = Wish.objects.filter(query).order_by(sorted_type.value)[start:last]
@@ -88,5 +88,26 @@ class WishListView(APIView):
 
 class WishLikeView(APIView):
     def post(self, request):
-        pass
+        data = request.data.copy()
 
+        wish_id = data.get('id')
+        sp_type = SpType.get_sp_type(data.get('songpyeon'))
+        if not sp_type:
+            return Response({'msg': '잘못된 송편입니다!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            wish_item = Wish.objects.get(id=wish_id)
+        except Wish.DoesNotExist:
+            return Response({'msg': '존재하지 않는 소원입니다!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        setattr(wish_item, sp_type.value, F(sp_type.value) + 1)
+        wish_item.sp_sum = F('sp_sum') + 1
+
+        wish_item.save()
+
+        response = {
+            'id': wish_item.id,
+            'success': True
+        }
+        
+        return Response(response, status=status.HTTP_200_OK)
