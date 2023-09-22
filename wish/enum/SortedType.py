@@ -7,8 +7,8 @@ class SortedType(Enum):
     
 sorted_type = { st.name:st for st in SortedType }
 
-def get_sorted_type(value: str):
-    if value in sorted_type:
-        return sorted_type[value]
+def get_sorted_type(name: str):
+    if name in sorted_type:
+        return sorted_type[name]
     
     return None
