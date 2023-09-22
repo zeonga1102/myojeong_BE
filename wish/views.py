@@ -1,4 +1,3 @@
-from random import randrange
 from uuid import uuid4
 from hashlib import sha256
 
@@ -6,7 +5,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from myojeong_be.const import emoji_list
 from wish.serializers import WishSerializer
 from wish.models import Wish
 
@@ -35,20 +33,28 @@ class WishView(APIView):
     def post(self, request):
         data = request.data.copy()
 
-        emoji = emoji_list(randrange(10)[0])
-        data['emoji'] = emoji
+        if not data.get('to_name'):
+            data['to_name'] = None
 
-        if not data.get('is_open'):
+        if data.get('is_open', True):
+            password = None
+        else:
             password = uuid4().hex
             data['password'] = password
 
         wish_serializer = WishSerializer(data=data)
         if wish_serializer.is_valid():
             saved_data = wish_serializer.save()
-            response = saved_data.__dict__
-            response['is_myself'] = True if saved_data.to_name else False
-            response['to_name'] = saved_data.to_name if saved_data.to_name else ''
-            response['password'] = password if saved_data.password else ''
+
+            response = {
+                'id': saved_data.id,
+                'from_name': data['from_name'],
+                'to_name': data['to_name'],
+                'content': data['content'],
+                'emoji': saved_data.emoji,
+                'password': password if password else '',
+                'is_myself': False if data['to_name'] else True
+            }
 
             return Response(response, status=status.HTTP_200_OK)
         

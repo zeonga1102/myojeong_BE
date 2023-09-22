@@ -1,7 +1,9 @@
 from hashlib import sha256
+from random import randrange
 
 from rest_framework import serializers
 
+from myojeong_be.const import emoji_list
 from wish.models import Wish
 
 
@@ -9,17 +11,7 @@ class WishSerializer(serializers.ModelSerializer):
     is_myself = serializers.SerializerMethodField(read_only=True)
 
     def get_is_myself(self, obj):
-        return True if obj.to_name else False
-
-    def validate(self, data):
-        if not data.get('is_open') and data.get('password'):
-            raise serializers.ValidationError(
-                detail={
-                    'msg': 'not valid attribute'
-                }
-            )        
-        
-        return data
+        return False if obj.to_name else True
     
 
     def create(self, validated_data):
@@ -31,13 +23,14 @@ class WishSerializer(serializers.ModelSerializer):
         if not validated_data.get('to_name'):
             validated_data['to_name'] = None
 
-        if not validated_data.get('password'):
-            validated_data['password'] = None
-        else:
+        if validated_data.get('password'):
             hashing = sha256()
             hashing.update(validated_data.get('password').encode('utf-8'))
 
             validated_data['password'] = hashing.hexdigest()
+        
+        emoji = emoji_list[randrange(10)][0]
+        validated_data['emoji'] = emoji
 
         wish = Wish(**validated_data)
         wish.save()
@@ -62,8 +55,6 @@ class WishSerializer(serializers.ModelSerializer):
 
         extra_kwargs = {
             'password': { 'write_only': True },
-            'sp1': { 'required': False },
-            'sp2': { 'required': False },
-            'sp3': { 'required': False }
+            'emoji': { 'required': False }
         }
         
