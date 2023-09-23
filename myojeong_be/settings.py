@@ -93,8 +93,12 @@ WSGI_APPLICATION = 'myojeong_be.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'myojeong',
+        'USER': get_env('DB_USER'),
+        'PASSWORD': get_env('DB_PW'),
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
