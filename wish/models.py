@@ -6,7 +6,7 @@ from myojeong_be.const import EMOJI_LIST
 class Wish(models.Model):
     from_name = models.CharField(max_length=6, db_index=True)
     to_name = models.CharField(max_length=6, null=True, default=None)
-    content = models.CharField(max_length=150)
+    content = models.CharField(max_length=90)
     emoji = models.CharField(max_length=2, choices=EMOJI_LIST)
     is_open = models.BooleanField(default=True)
     password = models.CharField(max_length=256, null=True, default=None)
