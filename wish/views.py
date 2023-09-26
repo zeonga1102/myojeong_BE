@@ -111,3 +111,10 @@ class WishLikeView(APIView):
         }
         
         return Response(response, status=status.HTTP_200_OK)
+    
+
+class WishCountView(APIView):
+    def get(self, request):
+        wish_count = Wish.objects.all().count()
+        return Response({'count': wish_count}, status=status.HTTP_200_OK)
+
