@@ -91,7 +91,7 @@ class WishLikeView(APIView):
         data = request.data.copy()
 
         wish_id = data.get('id')
-        sp_type = SpType.get_sp_type(data.get('songpyeon'))
+        sp_type = SpType.get_sp_type(data.get('type'))
         if not sp_type:
             return Response({'msg': '잘못된 송편입니다!'}, status=status.HTTP_400_BAD_REQUEST)
         
