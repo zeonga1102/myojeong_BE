@@ -7,13 +7,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from myojeong_be.const import LIST_LMIT
+from myojeong_be.logger import Logger
 from wish.serializers import WishSerializer, WishListSerializer
 from wish.models import Wish
 from wish.enum import SortedType, SpType
 
 
+logger = Logger(__name__)
+
+
 class WishView(APIView):
     def get(self, request):
+        logger.info(request)
+
         wish_id = request.GET.get('id')
         password = request.GET.get('password', '')
 
@@ -34,6 +40,8 @@ class WishView(APIView):
 
 
     def post(self, request):
+        logger.info(request)
+
         data = request.data.copy()
 
         if not data.get('to_name'):
@@ -61,11 +69,14 @@ class WishView(APIView):
 
             return Response(response, status=status.HTTP_200_OK)
         
+        logger.error(wish_serializer.errors)
         return Response(wish_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WishListView(APIView):
     def get(self, request):
+        logger.info(request)
+
         sorted_type = SortedType.get_sorted_type(request.GET.get('sorted', 'recent'))
         if not sorted_type:
             return Response({'msg': '잘못된 정렬 기준입니다!'}, status=status.HTTP_400_BAD_REQUEST)
@@ -88,6 +99,8 @@ class WishListView(APIView):
 
 class WishLikeView(APIView):
     def post(self, request):
+        logger.info(request)
+
         data = request.data.copy()
 
         wish_id = data.get('id')
@@ -115,6 +128,8 @@ class WishLikeView(APIView):
 
 class WishCountView(APIView):
     def get(self, request):
+        logger.info(request)
+
         wish_count = Wish.objects.all().count()
         return Response({'count': wish_count}, status=status.HTTP_200_OK)
 
